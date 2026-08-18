@@ -43,6 +43,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Ensure GHCR package is public
+        run: |
+          gh api -X PATCH "orgs/esempe-id/packages/container/eclipse-temurin" \
+            --field visibility=public
+
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
