@@ -10,16 +10,16 @@ packages needed by the Esempe panel runners.
 ```
 temurin/   Temurin-based images (one directory per Java version)
 base/      Base OS images (for example, Ubuntu or Debian)
-scripts/   Helper scripts (auto-generation of Dockerfiles)
+scripts/   Helper scripts 
 ```
 
 ## Temurin images
 
 Every version directory under `temurin/` (e.g. `temurin/25`) holds:
 
-- `package.extras` — extra APT packages to install, one per line
+- `package.extras` extra APT packages to install, one per line
   (plain text; blank lines and lines starting with `#` are ignored)
-- `Dockerfile` — **auto-generated**, do not edit by hand
+- `Dockerfile` **auto-generated**, do not edit by hand
 
 The generated Dockerfile is based on `eclipse-temurin:<version>-jre-resolute` (Ubuntu 26.04 / Resolute)
 and always installs the standard runner packages:
