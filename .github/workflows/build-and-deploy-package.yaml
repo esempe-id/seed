@@ -44,6 +44,8 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Ensure GHCR package is public
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh api -X PATCH "orgs/esempe-id/packages/container/eclipse-temurin" \
             --field visibility=public
