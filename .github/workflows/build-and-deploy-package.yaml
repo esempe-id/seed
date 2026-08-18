@@ -43,18 +43,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Diagnose GHCR package
+      - name: Verify GHCR package is public
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "== org packages =="
-          gh api "/orgs/esempe-id/packages?package_type=container" --jq '.[].name' 2>&1 || true
-          echo "== repo packages =="
-          gh api "/repos/esempe-id/seed/packages?package_type=container" --jq '.[].name' 2>&1 || true
-          echo "== get org pkg =="
-          gh api "/orgs/esempe-id/packages/container/eclipse-temurin" 2>&1 || true
-          echo "== repo pkg versions =="
-          gh api "/repos/esempe-id/seed/packages/container/eclipse-temurin/versions" --jq '.[].name' 2>&1 || true
+          VIS=$(gh api "/orgs/esempe-id/packages/container/eclipse-temurin" --jq '.visibility')
+          if [ "$VIS" != "public" ]; then
+            echo "::error::GHCR package visibility is '${VIS}'. Runners need public pull access;"
+            echo "::error::set it to public once at https://github.com/orgs/esempe-id/packages/container/package/eclipse-temurin/settings"
+            exit 1
+          fi
+          echo "GHCR package visibility: public"
 
       - name: Build and push
         uses: docker/build-push-action@v7
