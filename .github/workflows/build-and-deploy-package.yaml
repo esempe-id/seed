@@ -43,12 +43,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Ensure GHCR package is public
+      - name: Diagnose GHCR package
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api -X PATCH "orgs/esempe-id/packages/container/eclipse-temurin" \
-            --field visibility=public
+          echo "== org packages =="
+          gh api "/orgs/esempe-id/packages?package_type=container" --jq '.[].name' 2>&1 || true
+          echo "== repo packages =="
+          gh api "/repos/esempe-id/seed/packages?package_type=container" --jq '.[].name' 2>&1 || true
+          echo "== get org pkg =="
+          gh api "/orgs/esempe-id/packages/container/eclipse-temurin" 2>&1 || true
+          echo "== repo pkg versions =="
+          gh api "/repos/esempe-id/seed/packages/container/eclipse-temurin/versions" --jq '.[].name' 2>&1 || true
 
       - name: Build and push
         uses: docker/build-push-action@v7
