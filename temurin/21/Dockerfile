@@ -27,3 +27,19 @@ RUN apt-get update \
         wget \
     && rm -rf /var/lib/apt/lists/*
 
+# Configure user container with home directory /home/container (UID 1000).
+# If ubuntu user already exists (default on Ubuntu 24.04+ base images), rename it.
+RUN if id -u ubuntu >/dev/null 2>&1; then \
+        usermod -d /home/container -l container ubuntu \
+        && (groupmod -n container ubuntu || true); \
+    elif ! id -u container >/dev/null 2>&1; then \
+        (groupadd -g 1000 container || true) \
+        && (useradd -d /home/container -m -u 1000 -g 1000 -s /bin/bash container || useradd -d /home/container -m -u 1000 -s /bin/bash container); \
+    fi \
+    && mkdir -p /home/container \
+    && chown -R 1000:1000 /home/container
+
+USER container
+ENV USER=container HOME=/home/container
+WORKDIR /home/container
+
